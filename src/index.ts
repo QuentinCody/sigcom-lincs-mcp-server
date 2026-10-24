@@ -22,7 +22,7 @@ export class MyMCP extends StatelessMcpWorker {
 
     async init() {
 
-    	configureCitationSigning(this.env);
+        configureCitationSigning(this.env);
         const env = this.env as unknown as SigcomLincsEnv;
         registerQueryData(this.server, env);
         registerGetSchema(this.server, env);
