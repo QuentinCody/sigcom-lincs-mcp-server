@@ -1,0 +1,39 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "sigcom-lincs-mcp-server",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-10",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "alias": {
+    "ai": "./src/ai-stub.ts"
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": [
+        "SigcomLincsDataDO"
+      ]
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "class_name": "SigcomLincsDataDO",
+        "name": "SIGCOM_LINCS_DATA_DO"
+      }
+    ]
+  },
+  "worker_loaders": [
+    {
+      "binding": "CODE_MODE_LOADER"
+    }
+  ],
+  "observability": {
+    "enabled": true
+  },
+  "dev": {
+    "port": 8910
+  }
+}
