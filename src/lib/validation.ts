@@ -2,6 +2,10 @@ const record = (value: unknown): value is Record<string, unknown> => value !== n
 const fail = (message: string): never => { throw Object.assign(new Error(message), { status: 400 }); };
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+function hasControlCharacters(value: string): boolean {
+  return Array.from(value).some(character => character.charCodeAt(0) < 32);
+}
+
 function object(value: unknown, label: string): Record<string, unknown> {
   if (!record(value)) fail(`${label} must be an object`);
   return value as Record<string, unknown>;
@@ -16,7 +20,7 @@ function integer(value: unknown, fallback: number, max: number, label: string, m
 }
 function scalar(value: unknown, uuid = false) {
   if (uuid) { if (typeof value !== "string" || !UUID.test(value)) fail("Entity, signature, library and resource IDs must be UUIDs"); }
-  else if (!(typeof value === "string" && value.length > 0 && value.length <= 256 && !/[\x00-\x1f]/.test(value)) && !(typeof value === "number" && Number.isFinite(value)) && typeof value !== "boolean") fail("Filter values must be short strings, finite numbers or booleans");
+  else if (!(typeof value === "string" && value.length > 0 && value.length <= 256 && !hasControlCharacters(value)) && !(typeof value === "number" && Number.isFinite(value)) && typeof value !== "boolean") fail("Filter values must be short strings, finite numbers or booleans");
   return value;
 }
 function condition(value: unknown, uuid = false): unknown {
@@ -37,7 +41,7 @@ function where(value: unknown) {
     keys(meta, ["fullTextSearch", "symbol", "pert_name", "cell_line", "pert_dose", "pert_time", "pubchem_id", "assay", "tissue", "libraryName", "libraryID"], "meta filter");
     result.meta = Object.fromEntries(Object.entries(meta).map(([name, field]) => {
       if (name === "fullTextSearch") {
-        if (typeof field !== "string" || field.length < 1 || field.length > 200 || /[\x00-\x1f]/.test(field)) fail("fullTextSearch requires 1–200 printable characters");
+        if (typeof field !== "string" || field.length < 1 || field.length > 200 || hasControlCharacters(field)) fail("fullTextSearch requires 1–200 printable characters");
         return [name, field];
       }
       return [name, condition(field)];
@@ -63,7 +67,7 @@ export function metadataBody(value: unknown) {
 export function enrichmentBody(value: unknown) {
   const input = object(value, "body");
   keys(input, ["database", "up_entities", "down_entities", "signatures", "limit", "offset"], "enrichment");
-  if (typeof input.database !== "string" || input.database.trim().length < 1 || input.database.length > 200 || /[\x00-\x1f]/.test(input.database)) fail("database requires an exact repository name returned by /data/listdata");
+  if (typeof input.database !== "string" || input.database.trim().length < 1 || input.database.length > 200 || hasControlCharacters(input.database)) fail("database requires an exact repository name returned by /data/listdata");
   const up = uuidList(input.up_entities, "up_entities", 500, 1);
   const down = uuidList(input.down_entities, "down_entities", 500, 1);
   const upSet = new Set(up.map(item => item.toLowerCase()));

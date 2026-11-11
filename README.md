@@ -83,3 +83,13 @@ citations and large-result recovery. Run them serially within the available
 machine's resource budget, then run `scripts/verify-server.mjs sigcom-lincs`
 against the local Worker before deployment. No dependencies were installed and
 no deployment or cloud compute was launched by this implementation.
+
+<!-- license-and-data-terms:start -->
+## License and data terms
+
+The code in this repository is licensed under the Apache License 2.0 (see `LICENSE`).
+If you use it in your work, please cite it (see `CITATION.cff`). Citation is requested, not required.
+
+The license covers the code only. Data that this server returns comes from SigCom LINCS and stays under the terms of that source: LINCS data release policy: no restriction except citation; Broad clue.io L1000 terms: academic use only, commercial access by contact.
+You are responsible for your use of the data under those terms.
+<!-- license-and-data-terms:end -->
